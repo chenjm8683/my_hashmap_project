@@ -15,6 +15,18 @@ class LRUCache
   end
 
   def get(key)
+    if @map.include?(key)
+      # find the reference to the link from the HashMap
+      link = @map.get(key)
+      # Move the Link to tail in the LinkedList
+      update_link!(link)
+      # Return the value from the link
+      link.val
+    else
+      calc!(key)
+      eject! if count > @max
+      @store.last.val
+    end
   end
 
   def to_s
@@ -25,12 +37,19 @@ class LRUCache
 
   def calc!(key)
     # suggested helper method; insert an (un-cached) key
+    val = @prc.call(key)
+    @store.insert(key, val)
+    @map.set(key, @store.last)
   end
 
   def update_link!(link)
     # suggested helper method; move a link to the end of the list
+    @store.move_to_tail!(link)
   end
 
   def eject!
+    key = @store.first.key
+    @store.pop
+    @map.delete(key)
   end
 end
